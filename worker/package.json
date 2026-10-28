@@ -1,0 +1,12 @@
+{
+  "name": "voice-memo-journal-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node test/lib.test.js && node test/apps.test.js && node test/workout.test.js && node test/dailylog.test.js && node test/index.test.js",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

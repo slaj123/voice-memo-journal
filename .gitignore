@@ -1,0 +1,9 @@
+site/dist/
+site/journal/dist/
+site/workout/dist/
+site/dailylog/dist/
+.wrangler/
+**/__pycache__/
+scripts/test-inbox/
+*.wav
+.dev.vars

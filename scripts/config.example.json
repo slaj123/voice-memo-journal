@@ -1,0 +1,5 @@
+{
+  "worker_url": "https://voice-memo-journal.<your-subdomain>.workers.dev",
+  "upload_secret": "replace-with-your-real-UPLOAD_SECRET-value",
+  "app": "journal"
+}

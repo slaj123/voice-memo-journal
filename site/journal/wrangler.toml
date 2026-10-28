@@ -1,0 +1,20 @@
+# Pages config for the voice-journal project (root: site/journal).
+# Pages reads this file on every Git build, so it is the source of truth for
+# bindings. Secrets are NOT here; set them with
+#   npx wrangler pages secret put JOURNAL_PASSCODE --project-name voice-journal
+#   npx wrangler pages secret put SESSION_SECRET   --project-name voice-journal
+# and then trigger a new deploy (Pages snapshots secrets per deployment).
+name = "voice-journal"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-09-01"
+
+# Wrong-passcode counters for the login lockout (functions/_middleware.js).
+[[kv_namespaces]]
+binding = "AUTH_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Memo audio, read directly by functions/audio/[key].js behind the passcode.
+# (The voice Worker writes to this bucket; it no longer serves it publicly.)
+[[r2_buckets]]
+binding = "MEMOS_AUDIO"
+bucket_name = "voice-journal-audio"

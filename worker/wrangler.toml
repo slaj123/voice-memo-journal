@@ -1,0 +1,35 @@
+name = "voice-memo-journal"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+# Secrets (set via `wrangler secret put <NAME>`, never committed):
+#   OPENAI_API_KEY   - OpenAI key with Whisper + chat completion access
+#   GITHUB_TOKEN      - fine-grained PAT with contents:write on the memos repo only
+#   UPLOAD_SECRET     - shared secret the iOS Shortcut sends as the X-Upload-Secret
+#                        header; pick any long random string yourself
+#   WORKOUT_INGEST_SECRET - same value as the Workout Log app's INGEST_SECRET;
+#                        /workout/upload memos are POSTed there
+#   HABITS_INGEST_SECRET - same value as the Habits app's DAILYLOG_INGEST_SECRET;
+#                        each committed /dailylog memo pings HABITS_INGEST_URL
+#
+# Vars (plain, non-secret config):
+[vars]
+# Your PRIVATE repo that memos are committed to (your copy of this kit).
+GITHUB_OWNER = "your-github-username"
+GITHUB_REPO = "my-voice-journal"
+GITHUB_BRANCH = "main"
+MEMOS_PATH = "memos"
+# Optional companions. Leave these as-is if you don't use them; workout and
+# daily-log memos are still committed to GitHub either way.
+WORKOUT_INGEST_URL = "https://workout-log.<your-subdomain>.workers.dev/api/ingest"
+HABITS_INGEST_URL = "https://habits.<your-subdomain>.workers.dev/api/ingest/dailylog"
+
+# Only if you deploy the Habits kit: uncomment so this Worker can reach it
+# (a plain fetch to another workers.dev Worker on the same account is blocked).
+# [[services]]
+# binding = "HABITS"
+# service = "habits"
+
+[[r2_buckets]]
+binding = "MEMOS_AUDIO"
+bucket_name = "voice-journal-audio"
