@@ -331,12 +331,14 @@ async function handleTranscriptUpload(request, env, ctx, appConfig) {
 
 // Un-prefixed /upload(-transcript) routes to the legacy app; /<app>/upload
 // routes (e.g. /journal/upload) route to that named app in APPS.
-function resolveApp(pathname) {
+// ENABLED_APPS (wrangler.toml var, e.g. "journal,dailylog") turns routes on; unset means all.
+function resolveApp(pathname, env) {
+  const on = (name) => !env.ENABLED_APPS || env.ENABLED_APPS.split(",").map((s) => s.trim()).includes(name);
   if (pathname === "/upload" || pathname === "/upload-transcript") {
-    return { appConfig: APPS.legacy, action: pathname.slice(1) };
+    return on("legacy") ? { appConfig: APPS.legacy, action: pathname.slice(1) } : null;
   }
   const match = pathname.match(/^\/([^/]+)\/(upload|upload-transcript)$/);
-  if (match && APPS[match[1]]) {
+  if (match && APPS[match[1]] && on(match[1])) {
     return { appConfig: APPS[match[1]], action: match[2] };
   }
   return null;
@@ -347,7 +349,7 @@ export default {
     const url = new URL(request.url);
     try {
       if (request.method === "POST") {
-        const resolved = resolveApp(url.pathname);
+        const resolved = resolveApp(url.pathname, env);
         if (resolved) {
           return resolved.action === "upload"
             ? await handleUpload(request, env, ctx, resolved.appConfig)

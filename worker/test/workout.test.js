@@ -1,4 +1,5 @@
 import assert from "node:assert";
+import "./fixed-setup.js";
 import { APPS } from "../src/apps.js";
 import { buildCategoryPrompt, parseCategoryResponse, buildMemoRecord } from "../src/lib.js";
 

@@ -7,3 +7,4 @@ site/dailylog/dist/
 scripts/test-inbox/
 *.wav
 .dev.vars
+setup.json

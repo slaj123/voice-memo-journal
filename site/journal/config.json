@@ -1,3 +1,4 @@
 {
-  "audioBaseUrl": "/audio"
+  "audioBaseUrl": "/audio",
+  "timeZone": "America/Los_Angeles"
 }

@@ -4,6 +4,8 @@
 // an entry here plus wiring its routes in index.js — no changes needed to
 // the category-tagging logic in lib.js.
 
+import SETUP from "./setup.js";
+
 const REFLECTIONS_DESCRIPTION =
   "Personal reflections: working through feelings, decisions and things that happened.";
 const DAILY_REFLECTIONS_DESCRIPTION =
@@ -33,15 +35,12 @@ export const APPS = {
   // /journal/upload + /journal/upload-transcript. Personal journal —
   // entirely private, no ratings concept. Thoughts was added 2026-09-21
   // when the legacy app's single remaining Thoughts memo was migrated in.
+  // Categories come from your setup (src/setup.js); see configureJournal below.
   journal: {
     memosPath: "journal",
-    categories: ["Reflections", "Thoughts", "Daily Reflections"],
-    categoryDescriptions: {
-      Reflections: REFLECTIONS_DESCRIPTION,
-      Thoughts: "Business/project ideas and philosophical musings.",
-      "Daily Reflections": DAILY_REFLECTIONS_DESCRIPTION,
-    },
-    extraPromptNotes: [DAILY_REFLECTIONS_SUBCATEGORY_NOTE],
+    categories: [],
+    categoryDescriptions: {},
+    extraPromptNotes: [],
   },
 
   // /workout/upload + /workout/upload-transcript. Entirely private, same
@@ -115,3 +114,16 @@ export const APPS = {
     extraPromptNotes: [],
   },
 };
+
+// Applies your journal categories (src/setup.js) to the journal app. Tests call it
+// with a fixed list so your choices can't change what they check.
+export function configureJournal(list = SETUP.journal) {
+  const clean = (list || [])
+    .map((c) => ({ name: String(c?.name || "").trim().slice(0, 40), description: String(c?.description || "").trim().slice(0, 400) }))
+    .filter((c) => c.name);
+  if (!clean.length) throw new Error("setup.js needs at least one journal category");
+  APPS.journal.categories = clean.map((c) => c.name);
+  APPS.journal.categoryDescriptions = Object.fromEntries(clean.map((c) => [c.name, c.description || c.name]));
+  APPS.journal.extraPromptNotes = APPS.journal.categories.includes("Daily Reflections") ? [DAILY_REFLECTIONS_SUBCATEGORY_NOTE] : [];
+}
+configureJournal();

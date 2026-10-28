@@ -14,6 +14,8 @@ compatibility_date = "2026-08-01"
 #
 # Vars (plain, non-secret config):
 [vars]
+# Which upload routes are on (/journal/upload, /dailylog/upload, /workout/upload). `npm run setup` sets this.
+ENABLED_APPS = "journal,dailylog"
 # Your PRIVATE repo that memos are committed to (your copy of this kit).
 GITHUB_OWNER = "your-github-username"
 GITHUB_REPO = "my-voice-journal"

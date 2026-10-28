@@ -10,20 +10,29 @@ const SOURCES = ["journal", "dailylog"];
 const OUT_DIR = path.join(__dirname, "dist");
 const STATIC_DIR = path.join(__dirname, "static");
 const CONFIG_FILE = path.join(__dirname, "config.json");
-const { audioBaseUrl } = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8"));
-const TZ = "America/Los_Angeles";
+const { audioBaseUrl, timeZone } = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8"));
+const TZ = timeZone || "America/Los_Angeles";
 
-// Filter chips, in display order. Every memo maps to exactly one kind.
-const KINDS = ["Daily Log", "Reflections", "Goodnights", "Thoughts"];
+// Filter chips. Every memo maps to exactly one kind: its category, with two
+// conveniences: Daily Log memos and daily rundowns share "Daily Log", and
+// goodnight messages get their own "Goodnights" chip. Chips are built from the
+// memos (see kindsOf), so your own categories show up without any config.
+let KINDS = [];
 
 function kindOf(memo, source) {
   if (source === "dailylog") return "Daily Log";
-  if (memo.category === "Thoughts") return "Thoughts";
   if (/goodnight/i.test(memo.subcategory || "")) return "Goodnights";
   if (memo.category === "Daily Reflections") {
     return memo.subcategory === "Personal" ? "Goodnights" : "Daily Log";
   }
-  return "Reflections";
+  return memo.category || "Other";
+}
+
+// Daily Log first, then the rest by how many memos each has.
+function kindsOf(memos) {
+  const n = new Map();
+  for (const m of memos) n.set(m._kind, (n.get(m._kind) || 0) + 1);
+  return [...n.keys()].sort((a, b) => (a === "Daily Log" ? -1 : b === "Daily Log" ? 1 : n.get(b) - n.get(a) || a.localeCompare(b)));
 }
 
 function slugify(s) {
@@ -282,6 +291,7 @@ function page(memos) {
 
 function build() {
   const memos = loadMemos();
+  KINDS = kindsOf(memos);
   fs.rmSync(OUT_DIR, { recursive: true, force: true });
   fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.writeFileSync(path.join(OUT_DIR, "index.html"), page(memos));

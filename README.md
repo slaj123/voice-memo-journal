@@ -18,11 +18,11 @@ Several "apps" share one Worker, each with its own route and categories (see `wo
 
 | Route | Goes to | Categories |
 | --- | --- | --- |
-| `/journal/upload` | `memos/journal/`, shown on the journal site | Reflections, Thoughts, Daily Reflections |
+| `/journal/upload` | `memos/journal/`, shown on the journal site | Yours, chosen in setup (default: Reflections, Thoughts, Daily Reflections) |
 | `/dailylog/upload` | `memos/dailylog/`, shown on the same site under Daily Log | Daily Log (catch-all) |
 | `/workout/upload` | Sent to the [workout-log](https://github.com/slaj123/workout-log) kit, if you use it | One per activity |
 
-You can change the categories and their descriptions in `worker/src/apps.js`. The model only picks from the list you give it.
+You choose the journal categories and which routes are on in `npm run setup` (step 1). The model only picks from your list, guided by a one-line description of each.
 
 ## Important: keep your copy private
 
@@ -47,6 +47,26 @@ git clone https://github.com/<your-username>/<your-private-repo>.git
 cd <your-private-repo>
 ```
 
+**Make it yours:**
+
+```bash
+cd worker && npm install && cd ..
+npm run setup
+```
+
+It asks:
+- your GitHub username and the private repo's name;
+- your time zone;
+- your journal categories, each with a one-line description the AI uses to sort memos;
+- whether to turn on the Daily Log route;
+- whether to send workout memos to the Workout Log kit.
+
+It writes `worker/src/setup.js`, the vars in `worker/wrangler.toml` and the site's time zone. Your answers are kept in `setup.json` (git-ignored). Commit and push the other changes, which are preferences, not secrets.
+
+**Change categories later:** rerun `npm run setup`, then redeploy the Worker (`cd worker && npx wrangler deploy`). New chips show up on the site by themselves.
+
+**Set up with Claude Code:** open this folder in [Claude Code](https://claude.com/claude-code) and type `/setup`. It checks that your repo is private, helps you write your categories, and walks you through every step below.
+
 ## 2. Create a GitHub token for the Worker
 
 The Worker commits memos using a token that can only write to this one repo.
@@ -68,7 +88,7 @@ npx wrangler login
 npx wrangler r2 bucket create voice-journal-audio
 ```
 
-In `worker/wrangler.toml`, set `GITHUB_OWNER` to your GitHub username and `GITHUB_REPO` to your private repo's name.
+(`npm run setup` already put your username and repo name into `worker/wrangler.toml`.)
 
 Set the secrets. Each command asks you to paste a value:
 
@@ -168,8 +188,7 @@ It builds from whatever is in `memos/journal/` and `memos/dailylog/`. This repo 
 ## Tests
 
 ```bash
-cd worker && npm test
-cd site/journal && node audio.test.mjs
+npm test
 ```
 
 Everything is mocked, so the tests need no network access or keys.

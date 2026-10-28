@@ -1,0 +1,9 @@
+{
+  "name": "voice-memo-journal",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "test": "cd worker && npm test && cd ../site/journal && node audio.test.mjs"
+  }
+}

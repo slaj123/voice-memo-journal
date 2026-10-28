@@ -1,4 +1,5 @@
 import assert from "node:assert";
+import "./fixed-setup.js";
 import {
   slugify,
   buildFilename,
